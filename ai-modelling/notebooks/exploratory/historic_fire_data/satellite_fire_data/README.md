@@ -28,6 +28,7 @@ All files can be downloaded from https://firms.modaps.eosdis.nasa.gov/download. 
 ## Outputs
 
 - `satellite_fire_data.csv` – Gridded, feature-engineered time-series dataset
+- `satellite_fire_data.geojson` – Gridded, feature-engineered time-series dataset
 
 ## Output Features
 

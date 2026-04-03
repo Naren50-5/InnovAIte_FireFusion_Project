@@ -21,6 +21,7 @@ The final dataset covers Victoria, Australia, with a buffer to ensure detection 
 
 ## Outputs
 
+- `unified_historic_fire_dataset.geojson` – Final fire dataset with all computed metrics
 - `unified_historic_fire_dataset.csv` – Final fire dataset with all computed metrics
 
 ## Output Features
