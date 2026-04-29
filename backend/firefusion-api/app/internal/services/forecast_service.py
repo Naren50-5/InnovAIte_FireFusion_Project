@@ -4,7 +4,8 @@ from .caching_service import cache_client
 from .websocket_connection_manager import ws_manager
 from ..models.geojson import FeatureCollection
 
-REDIS_KEY = "predictions"
+LATEST_KEY = "predictions"
+HISTORY_KEY = "predictions_history"
 
 
 class ForecastService:
@@ -14,42 +15,47 @@ class ForecastService:
 
             payload = json.loads(message.body)
 
-            # ensure date exists for filtering
+            # ensure date exists
             if "date" not in payload:
                 payload["date"] = datetime.utcnow().date().isoformat()
 
             geojson = FeatureCollection(**payload)
 
-            # broadcast to websocket clients
+            # broadcast
             await ws_manager.broadcast(geojson.model_dump())
 
-            # store in Redis list
+            # ✅ KEEP existing latest prediction logic
+            await cache_client.set(LATEST_KEY, message.body)
+
+            # ✅ ADD history (do NOT replace anything)
             await cache_client.rpush(
-                REDIS_KEY,
+                HISTORY_KEY,
                 json.dumps(geojson.model_dump())
             )
 
+    # ✅ UNCHANGED: frontend depends on this
     async def fetch_predictions(self):
-        data = await cache_client.lrange(REDIS_KEY, 0, -1)
+        data = await cache_client.get(LATEST_KEY)
+        if data is None:
+            return None
+        return json.loads(data)
 
+    # ✅ NEW: fetch all history
+    async def fetch_all_history(self):
+        data = await cache_client.lrange(HISTORY_KEY, 0, -1)
         if not data:
             return []
-
         return [json.loads(item) for item in data]
 
+    # ✅ NEW: filter by date
     async def fetch_history_by_date(self, target_date):
-        data = await cache_client.lrange(REDIS_KEY, 0, -1)
-
+        data = await cache_client.lrange(HISTORY_KEY, 0, -1)
         if not data:
             return []
 
         target = target_date.isoformat()
-
-        filtered = []
-        for item in data:
-            obj = json.loads(item)
-
-            if obj.get("date") == target:
-                filtered.append(obj)
-
-        return filtered
+        return [
+            json.loads(item)
+            for item in data
+            if json.loads(item).get("date") == target
+        ]

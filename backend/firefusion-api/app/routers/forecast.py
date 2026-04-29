@@ -17,14 +17,14 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_manager.disconnect(websocket)
 
 
-# ✅ KEEP EXISTING ENDPOINT
-@router.get("/bushfire-forecast", tags=["bushfire"])
+# ✅ DO NOT TOUCH
+@router.get("/bushfire-forecast")
 async def get_bushfire_forecast(service: ForecastService = Depends(ForecastService)):
     return await service.fetch_predictions()
 
 
-# ✅ UPDATED: optional date parameter
-@router.get("/history", tags=["bushfire"])
+# ✅ NEW FUNCTIONALITY ONLY
+@router.get("/history")
 async def get_history(
     target_date: Optional[date] = Query(None, description="YYYY-MM-DD"),
     service: ForecastService = Depends(ForecastService)
@@ -32,5 +32,4 @@ async def get_history(
     if target_date:
         return await service.fetch_history_by_date(target_date)
 
-    # fallback → return all history
-    return await service.fetch_predictions()
+    return await service.fetch_all_history()
