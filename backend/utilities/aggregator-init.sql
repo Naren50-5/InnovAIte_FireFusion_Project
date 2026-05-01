@@ -152,9 +152,9 @@ SELECT
     at_risk_infrastructure.facility_name,
     at_risk_infrastructure.category
 FROM fire_events
-LEFT JOIN weather_conditions    ON fire_events.weather_id  = weather_conditions.weather_id
-LEFT JOIN topography            ON fire_events.topo_id     = topography.topo_id
-LEFT JOIN fuel_and_vegetation   ON fire_events.fuel_id     = fuel_and_vegetation.fuel_id
+LEFT JOIN weather_conditions     ON fire_events.weather_id  = weather_conditions.weather_id
+LEFT JOIN topography             ON fire_events.topo_id     = topography.topo_id
+LEFT JOIN fuel_and_vegetation    ON fire_events.fuel_id     = fuel_and_vegetation.fuel_id
 LEFT JOIN at_risk_infrastructure ON fire_events.facility_id = at_risk_infrastructure.facility_id;
 
 -- =========================================
@@ -215,12 +215,27 @@ INSERT INTO fire_events (event_id, weather_id, topo_id, fuel_id, facility_id, la
 
 -- =========================================
 -- PERFORMANCE INDEXES
--- Speeds up JOIN queries on fire_events
+-- Speeds up queries across all tables
 -- =========================================
 
+-- fire_events: indexes on all foreign keys and date
 CREATE INDEX idx_fire_events_weather_id  ON fire_events(weather_id);
 CREATE INDEX idx_fire_events_topo_id     ON fire_events(topo_id);
 CREATE INDEX idx_fire_events_fuel_id     ON fire_events(fuel_id);
 CREATE INDEX idx_fire_events_facility_id ON fire_events(facility_id);
 CREATE INDEX idx_fire_events_event_date  ON fire_events(event_date);
+
+-- weather_conditions: index on date and location for time-based queries
 CREATE INDEX idx_weather_record_date     ON weather_conditions(record_date);
+CREATE INDEX idx_weather_lat_lon         ON weather_conditions(latitude, longitude);
+
+-- fuel_and_vegetation: index on date and vegetation class for filtering
+CREATE INDEX idx_fuel_record_date        ON fuel_and_vegetation(record_date);
+CREATE INDEX idx_fuel_vegetation_class   ON fuel_and_vegetation(vegetation_class);
+
+-- topography: index on location for spatial lookups
+CREATE INDEX idx_topo_lat_lon            ON topography(latitude, longitude);
+
+-- at_risk_infrastructure: index on category for filtering by type
+CREATE INDEX idx_infrastructure_category ON at_risk_infrastructure(category);
+CREATE INDEX idx_infrastructure_lga      ON at_risk_infrastructure(lga);
