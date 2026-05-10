@@ -17,7 +17,7 @@ The final dataset is designed to align with the project's 5 km grid and 12-hour 
 
 ## Inputs
 - **'ECMWF/CAMS/NRT'**:  Copernicus Atmospheric Monitoring Service Global Near-Real-time dataset from Google Earth Engine
-- **Victoria boundary**: used to restrict extraction to Vitoria, Australia
+- **Victoria boundary**: used to restrict extraction to Victoria, Australia
 - **5 km grid setup**: data will be exported using a 5 km grid
 - **Date range**: 2018 to 2022
 
@@ -107,7 +107,7 @@ Export the processed CAMS data as a CSV file.
 | Time Period | 2018-2022 | Matches the main model training period |
 | Temporal format | 12-hour interval | Matches weather data structure |
 | Spatial format | 5 km grid | Matches the other datasets grid |
-| Core features | AOD at 550 nm, PM2.5 | Avaiable across the full period |
+| Core features | AOD at 550 nm, PM2.5 | Available across the full period |
 | Output format | CSV | Used for merging and modelling |
 
 ## Use Case
